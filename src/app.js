@@ -1,32 +1,51 @@
 const express = require("express");
+const {connectDb} = require("../config/database");
+const User = require("../config/models/users");
 
 const app = express();
-// console.log(app.toString());
 
-app.use((req,res,next)=>{
-    next( new Error("errrrroooooooooooor"));
+app.use(express.json());
+
+app.post("/signup", async (req,res)=>{
+
+    const user = new User(req.body)
+    try{
+        user.save();
+        res.send("user saved");
+    }
+    catch(err){
+        res.status(400).send(err.message);
+    }
 })
 
-app.use("/admin",(req,res,next)=>{
-    console.log("admin auth")
-    let name = "o";
-    if(name === "o") next();
-    else res.status(401).send("no access"); 
-    // res.send("hi");
+app.get("/user", async (req,res)=>{
+    let name = req.body.firstName;
+
+    try{
+        let user = await User.findOne({firstName:name});
+        res.send(user);
+    }catch(err){
+        res.send("somnethig went wrong");
+    }
 })
 
-app.get("/admin/getdata",(req,res)=>{
-    res.send("gettingData");
+app.get("/feed",async(req,res)=>{
+    let name = req.body.firstName;
+    try{
+        let users = await User.find({firstName:name});
+        if(!users.length) res.status(404).send("user not found");
+        res.send(users);
+    }
+    catch(err){
+        res.send("something not working")
+    }
 })
 
-app.get("/admin/deletedata",(req,res)=>{
-    res.send("deleting data");
+connectDb().then(()=>{
+    console.log("Connected to db");
+    app.listen(9000,()=>{
+        console.log("server is running on 9000 port");
+    })
+}).catch((err)=>{
+    console.log("error occurred",err.message);
 })
-
-app.use((err,req,res,next)=>{
-    res.status(500).send("error");
-})
-
-app.listen(9000,()=>{
-    console.log("server is running on 9000 port");
-});
