@@ -7,4 +7,11 @@ const signupValidation = (req)=>{
 
 }
 
-module.exports = signupValidation;
+const validateEditProfileData = (req)=>{
+    const allowedEditFields = ["firstName","lastName"];
+    const valid = Object.keys(req.body).every((field)=> allowedEditFields.includes(field));
+    
+    return valid
+}
+
+module.exports = {signupValidation,validateEditProfileData};
