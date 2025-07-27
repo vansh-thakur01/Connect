@@ -20,18 +20,23 @@ authRouter.post("/signup", async (req, res) => {
       password: passwordHash,
     });
     const data = await user.save();
-    res.send("user saved");
+    res.json({
+      message:"User created successfully",
+      data
+    });
   } catch (err) {
     res.status(400).send(err.message);
   }
 });
 
-authRouter.get("/login", async (req, res) => {
+
+authRouter.post("/login", async (req, res) => {
   try {
     let { email, password } = req.body;
     let user = await User.find({ email: email });
     if (!user) throw new Error("Invalid crediantials");
     let [userData] = user;
+    
     const isPasswordValid = await bcrypt.compare(password, userData.password);
     if (isPasswordValid) {
       const token = userData.getJwt();
@@ -39,10 +44,15 @@ authRouter.get("/login", async (req, res) => {
       res.cookie("token", token, {
         expires: new Date(Date.now() + 5 * 36000000),
       });
-      res.send("login successful");
     } else throw new Error("Invlid crediantials");
-  } catch (err) {
-    res.status(404).send("something went wrong: " + err.message);
+
+    res.json({
+      message:"Loggedin successfully",
+      userData
+    });
+
+    } catch (err) {
+    res.status(400).json({error : err.message});
   }
 });
 
