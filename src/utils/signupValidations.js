@@ -1,5 +1,6 @@
 const validator = require("validator");
 const signupValidation = (req)=>{
+    console.log(req,"qqqq")
     const {lastName, firstName, email, password} = req;
     if(!firstName || !lastName) throw new Error("name is not valid");
     if(!validator.isEmail(email)) throw new Error("Email is not valid");

@@ -47,7 +47,7 @@ requestRouter.post("/request/send/:status/:toUserId",userAuth, async (req,res)=>
             data
         })
     }catch(err){
-        res.status(404).send("Error: " + err.message);
+        res.status(400).send("Error: " + err.message);
     }
 })
 
@@ -60,6 +60,7 @@ requestRouter.post("/request/review/:status/:requestId", userAuth, async (req,re
         if(!allowedStatus.includes(status)) return res.status(400).json({message:"Status is not valid"});
         if(!mongoose.Types.ObjectId.isValid(requestId)) return res.status(400).json({message:"RequestedId format is invalid"});
         const connectionRequest = await ConnectionRequest.findOne({_id:requestId,toUserId:loggedInUser,status:"interested"});
+        console.log(loggedInUser,requestId,connectionRequest)
         if(!connectionRequest){
             return res.status(400).json({message:"Connection request not found"});
         }

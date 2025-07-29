@@ -11,11 +11,12 @@ userRouther.get("/user/requests/received", userAuth, async(req, res)=>{
         const loggedInUser = req.user;
         console.log(loggedInUser._id);
 
-        const connectionRequests = await ConnectionRequest.find({
+        let connectionRequests = await ConnectionRequest.find({
             toUserId:loggedInUser._id,
             status:"interested"
-        }).populate("fromUserId","firstName lastName").lean();
-
+        }).populate("fromUserId","firstName lastName url about age").lean();
+        
+        // connectionRequests = connectionRequests.map(obj=>obj.fromUserId)
         res.json({
             message: "Data fetched successfully",
             data:connectionRequests
@@ -29,7 +30,7 @@ userRouther.get("/user/requests/received", userAuth, async(req, res)=>{
 userRouther.get("/user/connections", userAuth,async (req,res)=>{
     try{
         let loggedInUser = req.user._id;
-        const USER_SAFE_DATA = "firstName lastName";
+        const USER_SAFE_DATA = "firstName lastName url about age";
 
         const connectionRequest = await ConnectionRequest.find({
             $and:[

@@ -8,6 +8,7 @@ const jwt = require("jsonwebtoken");
 
 authRouter.post("/signup", async (req, res) => {
   try {
+    console.log(req.body,"sdfad")
     signupValidation(req.body);
 
     let { password, lastName, firstName, email ,url, about,age} = req.body;
