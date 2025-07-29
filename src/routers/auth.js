@@ -10,7 +10,7 @@ authRouter.post("/signup", async (req, res) => {
   try {
     signupValidation(req.body);
 
-    let { password, lastName, firstName, email } = req.body;
+    let { password, lastName, firstName, email ,url, about,age} = req.body;
 
     const passwordHash = await bcrypt.hash(password, 10);
     const user = new User({
@@ -18,6 +18,9 @@ authRouter.post("/signup", async (req, res) => {
       lastName,
       email,
       password: passwordHash,
+      url,
+      about,
+      age
     });
     const data = await user.save();
     res.json({
@@ -48,17 +51,26 @@ authRouter.post("/login", async (req, res) => {
 
     res.json({
       message:"Loggedin successfully",
-      userData
+      data:userData
     });
 
     } catch (err) {
-    res.status(400).json({error : err.message});
+    res.status(400).json({message: "Invalid Credentals"});
   }
 });
 
 authRouter.post("/logout",(req,res)=>{
+  try{
     res.cookie("token",null,{expires:new Date(Date.now())})
-    res.send("Logout successful")
+    res.json({
+      message:"Logout successfully"
+    })
+  }
+  catch(err){
+    res.status(400).json({
+      message:"Token is not present"
+    })
+  }
 })
 
 module.exports = authRouter;

@@ -57,12 +57,12 @@ userRouther.get("/user/connections", userAuth,async (req,res)=>{
 
 userRouther.get("/feed", userAuth, async (req,res)=>{
     try{
-        let page = (parseInt(req.query.page)) || 0;
+        let page = (parseInt(req.query.page)) || 1;
         let limit = (parseInt(req.query.limit))|| 10;
         limit = limit > 50 ? 10 : limit;
         page = (page-1)*limit;
 
-        const USER_SAFE_DATA = "firstName lastName";
+        const USER_SAFE_DATA = "firstName lastName url about age";
 
         const loggedInUser = req.user;
         const haveMet = await ConnectionRequest.find({
@@ -70,8 +70,9 @@ userRouther.get("/feed", userAuth, async (req,res)=>{
                 {fromUserId:loggedInUser._id},
                 {toUserId:loggedInUser}
             ]
-        }).populate("fromUserId",USER_SAFE_DATA).populate("toUserId",USER_SAFE_DATA);
+        }).populate("fromUserId").populate("toUserId");
 
+        console.log(haveMet);
 
         const haveMetIdsQuery = haveMet.map((obj)=>{
             if(obj.fromUserId.equals(loggedInUser._id)) return {_id:{$ne:obj.toUserId._id}};
@@ -83,7 +84,7 @@ userRouther.get("/feed", userAuth, async (req,res)=>{
                 ...haveMetIdsQuery,
                 {_id:{$ne:loggedInUser._id}}
             ]
-        },{firstName:1,lastName:1}).skip(page).limit(limit).lean()
+        },{firstName:1,lastName:1,url:1,about:1,age:1}).skip(page).limit(limit).lean()
 
         res.json({
             message:"New connection found successfully",

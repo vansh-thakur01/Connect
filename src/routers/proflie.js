@@ -8,9 +8,15 @@ const userAuth = require("../middleware/userAuth");
 profileRouter.get("/profile", userAuth, async (req, res)=>{
     try{
         const user = req.user;
-        res.send(user);
+        res.json({
+            message:"User data fetched successfully",
+            data:user
+        });
     }catch(err){
-        res.status(400).send("Error:" + err.message);
+        res.status(400).json({
+            message:"Error:" + err.message,
+            data:null
+        });
     }
 });
 profileRouter.patch("/profile/edit/password", userAuth, async (req,res)=>{
@@ -35,7 +41,7 @@ profileRouter.patch("/profile/edit",userAuth,async (req, res)=>{
         await user.save();
 
         res.json({
-            message:`${user.firstName}, your profile update successfuly`,
+            message:`${user.firstName}, your profile updated successfully`,
             data:user,
         });
     }catch(err){
